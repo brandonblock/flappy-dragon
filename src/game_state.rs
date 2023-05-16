@@ -1,9 +1,10 @@
 use crate::player::Player;
+use crate::terrain::Obstacle;
 
 use bracket_lib::prelude::*;
 
 const SCREEN_WIDTH: i32 = 80;
-const SCREEN_HEIGHT: i32 = 50;
+pub const SCREEN_HEIGHT: i32 = 50;
 const FRAME_DURATION: f32 = 75.0;
 
 enum GameMode {
@@ -15,7 +16,9 @@ enum GameMode {
 pub struct State {
     player: Player,
     frame_time: f32,
+    obstacle: Obstacle,
     mode: GameMode,
+    score: i32,
 }
 
 impl State {
@@ -23,7 +26,9 @@ impl State {
         State {
             player: Player::new(2, 25),
             frame_time: 0.0,
+            obstacle: Obstacle::new(SCREEN_WIDTH, 0),
             mode: GameMode::Menu,
+            score: 0,
         }
     }
     fn restart(&mut self) {
@@ -35,7 +40,9 @@ impl State {
         self.menu(ctx, "Welcome to Flappy Dragon");
     }
     fn dead(&mut self, ctx: &mut BTerm) {
-        self.menu(ctx, "You are dead!")
+        ctx.cls();
+        ctx.print_centered(5, "You are dead!");
+        ctx.print_centered(6, &format!("You earned {} points", self.score));
     }
     fn menu(&mut self, ctx: &mut BTerm, message: &str) {
         ctx.cls();
@@ -62,8 +69,17 @@ impl State {
             self.player.flap();
         }
         self.player.render(ctx);
+
         ctx.print(0, 0, "Press Space to flap.");
-        if self.player.y > SCREEN_HEIGHT {
+        ctx.print(0, 1, &format!("Score: {}", self.score));
+
+        self.obstacle.render(ctx, self.player.x);
+
+        if self.player.x > self.obstacle.x {
+            self.score += 1;
+            self.obstacle = Obstacle::new(self.player.x + SCREEN_WIDTH, self.score);
+        }
+        if self.player.y > SCREEN_HEIGHT || self.obstacle.hit_obstacle(&self.player) {
             self.mode = GameMode::End;
         }
     }
