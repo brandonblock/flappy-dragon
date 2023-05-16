@@ -42,9 +42,13 @@ impl State {
         self.menu(ctx, "Welcome to Flappy Dragon");
     }
     fn dead(&mut self, ctx: &mut BTerm) {
-        ctx.cls();
-        ctx.print_centered(5, "You are dead!");
-        ctx.print_centered(6, &format!("You earned {} points", self.score));
+        // ctx.cls();
+        // ctx.print_centered(5, "You are dead!");
+        // ctx.print_centered(6, &format!("You earned {} points", self.score));
+        self.menu(
+            ctx,
+            &format!("You are dead, you earned {} points", self.score),
+        );
     }
     fn menu(&mut self, ctx: &mut BTerm, message: &str) {
         ctx.cls();
