@@ -1,6 +1,7 @@
 use crate::game_state::State;
 
 pub mod game_state;
+pub mod player;
 
 use bracket_lib::prelude::*;
 
